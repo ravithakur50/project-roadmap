@@ -1,0 +1,47 @@
+[
+  {
+    "title": "Planning & Scope",
+    "status": "completed",
+    "owner": "Project Lead",
+    "due": "2026-10-15",
+    "priority": "High",
+    "progress": 100,
+    "notes": "Requirements gathered, scope agreed, and initial milestones approved."
+  },
+  {
+    "title": "Design & Wireframes",
+    "status": "completed",
+    "owner": "UI Team",
+    "due": "2026-10-22",
+    "priority": "High",
+    "progress": 100,
+    "notes": "User flow and interface design finalized."
+  },
+  {
+    "title": "Core Development",
+    "status": "in-progress",
+    "owner": "Engineering",
+    "due": "2026-11-15",
+    "priority": "High",
+    "progress": 70,
+    "notes": "Core feature work is in progress and under active review."
+  },
+  {
+    "title": "Testing & QA",
+    "status": "pending",
+    "owner": "QA Team",
+    "due": "2026-11-30",
+    "priority": "Medium",
+    "progress": 20,
+    "notes": "Test cases are being created; automation work is scheduled."
+  },
+  {
+    "title": "Release Preparation",
+    "status": "blocked",
+    "owner": "Operations",
+    "due": "2026-12-10",
+    "priority": "High",
+    "progress": 0,
+    "notes": "Waiting on final approval and deployment checklist."
+  }
+]
