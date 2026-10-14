@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Roadmap</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 0 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.2rem;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .summary-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .summary-card .label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .summary-card .value {
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .roadmap {
+      display: grid;
+      gap: 20px;
+    }
+
+    .phase {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .phase-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .phase h2 {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .status.in-progress { background: #dbeafe; color: #1d4ed8; }
+    .status.completed { background: #dcfce7; color: #166534; }
+    .status.pending { background: #fef3c7; color: #92400e; }
+    .status.blocked { background: #fee2e2; color: #991b1b; }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin: 12px 0;
+    }
+
+    .progress-block {
+      margin-top: 12px;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #60a5fa);
+      border-radius: 999px;
+    }
+
+    .notes {
+      margin-top: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .footer-note {
+      margin-top: 28px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Project Roadmap</h1>
+      <div id="last-updated" style="color:#6b7280; font-size:0.95rem;"></div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-card">
+        <div class="label">Total Phases</div>
+        <div class="value" id="total-phases">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Completed</div>
+        <div class="value" id="completed-count">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">In Progress</div>
+        <div class="value" id="in-progress-count">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Overall Progress</div>
+        <div class="value" id="overall-progress">0%</div>
+      </div>
+    </div>
+
+    <main id="roadmap" class="roadmap"></main>
+
+    <div class="footer-note">
+      Update the roadmap in <strong>roadmap.json</strong> and commit the change to keep the page current.
+    </div>
+  </div>
+
+  <script>
+    async function loadRoadmap() {
+      const response = await fetch('./roadmap.json');
+      const data = await response.json();
+
+      const roadmap = document.getElementById('roadmap');
+      const totalPhases = document.getElementById('total-phases');
+      const completedCount = document.getElementById('completed-count');
+      const inProgressCount = document.getElementById('in-progress-count');
+      const overallProgress = document.getElementById('overall-progress');
+      const lastUpdated = document.getElementById('last-updated');
+
+      let completed = 0;
+      let inProgress = 0;
+      let totalProgress = 0;
+
+      roadmap.innerHTML = '';
+
+      data.forEach((item) => {
+        totalProgress += Number(item.progress || 0);
+
+        if (item.status === 'completed') completed++;
+        if (item.status === 'in-progress') inProgress++;
+
+        const phase = document.createElement('div');
+        phase.className = 'phase';
+
+        const statusClass = item.status.toLowerCase().replace(/\s+/g, '-');
+        const statusText = item.status.charAt(0).toUpperCase() + item.status.slice(1);
+
+        phase.innerHTML = `
+          <div class="phase-top">
+            <h2>${item.title}</h2>
+            <span class="status ${statusClass}">${statusText}</span>
+          </div>
+
+          <div class="meta">
+            <span>Owner: ${item.owner || 'Not assigned'}</span>
+            <span>Due: ${item.due || 'TBD'}</span>
+            <span>Priority: ${item.priority || 'Normal'}</span>
+          </div>
+
+          <div class="progress-block">
+            <div class="progress-label">
+              <span>Progress</span>
+              <span>${item.progress || 0}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width:${item.progress || 0}%"></div>
+            </div>
+          </div>
+
+          <div class="notes">${item.notes || 'No notes yet.'}</div>
+        `;
+
+        roadmap.appendChild(phase);
+      });
+
+      totalPhases.textContent = data.length;
+      completedCount.textContent = completed;
+      inProgressCount.textContent = inProgress;
+      const avgProgress = data.length ? Math.round(totalProgress / data.length) : 0;
+      overallProgress.textContent = avgProgress + '%';
+
+      const now = new Date();
+      lastUpdated.textContent = 'Updated: ' + now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    loadRoadmap().catch((error) => {
+      console.error('Error loading roadmap:', error);
+      document.getElementById('roadmap').innerHTML = `
+        <div class="phase">
+          <h2>Unable to load roadmap</h2>
+          <p>Check if roadmap.json exists and is valid JSON.</p>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>
